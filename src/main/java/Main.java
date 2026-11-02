@@ -16,6 +16,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.time.LocalDate;
 
+
+
 public class Main {
     static final String ANKI_DECK = "Schach-Training";
     static final String ANKI_MODEL = "Einfach";
@@ -55,7 +57,6 @@ public class Main {
 
         StockfishClient stockfish = new StockfishClient();
 
-        // Anki Media Pfad bekommen
         String os = System.getProperty("os.name").toLowerCase();
         String ankiMediaDir = "";
         String ankiProfile = "Benutzer 1";
@@ -123,24 +124,24 @@ public class Main {
 
                             StockfishClient.AnalysisResult evalDanach = stockfish.getEval(board.getFen(), 12);
 
-                            int verlust = evalVorher.score + evalDanach.score;
+                            int score = evalVorher.score + evalDanach.score;
 
                             // patzer check
-                            if (verlust >= 300) {
-                                System.out.println("PATZER GEFUNDEN!");
+                            if (score >= 300) {
+                                System.out.println("PATZER");
                                 System.out.println("Dein Zug: " + move.toString() + " | Bester Zug: " + evalVorher.bestMove);
 
                                 String imageName = "blunder_" + System.currentTimeMillis() + ".png";
                                 String fullPath = ankiMediaDir + imageName;
                                 renderer.generateImage(fenVorher, fullPath);
 
-                                double bauernVerlust = Math.round((verlust / 100.0) * 100.0) / 100.0;
+                                double bauernVerlust = Math.round((score / 100.0) * 100.0) / 100.0;
 
                                 String front = "<img src='" + imageName + "'><br><br><b>Finde den besten Zug für " + colorName + "!</b>";
 
                                 String back = "Du hast gespielt: <b>" + move.toString() + "</b><br>"
                                         + "Bester Zug: <b style='color:green;'>" + evalVorher.bestMove + "</b><br>"
-                                        + "Bewertungsverlust: <b>" + bauernVerlust + " Bauern</b>";
+                                        + "Bewertungsscore: <b>" + bauernVerlust + " Bauern</b>";
 
                                 sendToAnki(client,targetDeck, front, back);
                                 Thread.sleep(10);
@@ -193,7 +194,7 @@ public class Main {
         try {
             client.send(request, HttpResponse.BodyHandlers.discarding());
         } catch (Exception e) {
-            System.out.println("Konnte Karte nicht an Anki senden. Ist Anki geöffnet? Fehler: " + e.getMessage());
+            System.out.println("Fehler: " + e.getMessage());
         }
     }
 
